@@ -6,11 +6,14 @@
  - We will be using YOLOv5 for the prototype version. You can find the Yolo Weights files --> [HERE](https://github.com/ultralytics/yolov5/releases) <--  
  (Use YOLOv5s-seg or YOLOv5n-seg for faster training and detection)
  - We will also need the [YOLOv5 Repository](https://github.com/ultralytics/yolov5) as they have already created nice training and testing scripts, very useful.  
- <mark>IMPORTANT:</mark> A requirements.txt file can be found inside this yolov5 repository that you just cloned. We will be using almost all of the mentioned package versions. Almost. This requirements.txt installs PyTorch v2.4.0 which has some problems with windows, altough I did try with WSL with no result(maybe it would work on a linux machine), it shows a missing .dll file issue and I do not want to mess around with dll files. So I used pytorch v2.3.1, along with torchvision v0.18.1 which is compatible with our pytorch version, and it works just fine.  
+ <mark>IMPORTANT:</mark>USE PyTorch v2.3.1 and TorchVision v0.18.1.  
+ A requirements.txt file can be found inside this yolov5 repository that you just cloned. We will be using almost all of the mentioned package versions. Almost. This requirements.txt installs PyTorch v2.4.0 which has some problems with windows it shows a missing .dll file issue and I do not want to mess around with dll files. So I used pytorch v2.3.1, along with torchvision v0.18.1 which is compatible with our pytorch version, and it works just fine.  
  ```pip install torch==2.3.1 torchvision==0.18.1```
  - Next, if you are on windows, there will be a problem with POSIX complaint path system so inside the cloned yolov5 repository, edit the detect.py file and add the following just below import pathlib, somewhere around line 37:  
- ```temp = pathlib.PosixPath```  
- ```pathlib.PosixPath = pathlib.WindowsPath```  
+ ```
+ temp = pathlib.PosixPath  
+ pathlib.PosixPath = pathlib.WindowsPath
+ ```  
  - We also need to create a config file for our dataset. Create a file dataset_config.yaml and add the following to it:
  ```
     path: /path/to/output/folder # Just change this line
@@ -44,13 +47,14 @@ cifar-10-/
 |&nbsp;&nbsp;&nbsp;&nbsp;|-- ...  
 
 We also need a labels folder which is primarily used for multi-object detection in a single frame. All this will be done in organiseTheData.py like so:  
-```python organizeTheData.py --dataset_dir='/path/to/GenderClassifficationDataset/' --output_dir='path/to/output_dir/' --classes='{"male": 0, "female": 1}' --update_interval 1000``` 
+```python organizeTheData.py --dataset_dir='/path/to/GenderClassifficationDataset/' --output_dir='path/to/output_dir/' --classes='{"male": 0, "female": 1}' --update_interval 1000```   
+
 It takes some time so go get some coffee or something.  
 
 Now we can finally start the training process. Everything is done, now go inside the clone yolov5 repo, just run:  
-``` python train.py --img 96 --batch 16 --epochs 3 --data /path/to/dataset_config.yaml --cfg /path/to/yolov5s.yaml --weights ../path/to/yolov5s-seg.pt ```
+``` python train.py --img 96 --batch 16 --epochs 3 --data /path/to/dataset_config.yaml --cfg /path/to/yolov5s.yaml --weights ../path/to/yolov5s-seg.pt ```  
 
 To test the model, use the detect.py file:  
 ```python detect.py --weights runs/train/exp11/weights/best.pt --img 96 --conf 0.25 --source 0```  
-source 0 is for camera, if you want to use a video file, use the path to the video file as the arument to source.  
+The ```--source 0``` is for camera, if you want to use a video file, use the path to the video file as the arument to source.  
 The best weights file will be saved in the folder runs/train/expxx where xx represents the last folder number, in our example it was exp11
